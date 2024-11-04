@@ -48,6 +48,7 @@
                     <tr>
                         <th>S.N.</th>
                         <th>Title</th>
+                        <th>Cooking Time</th>
                         <th>Price</th>
                         <th>Image</th>
                         <th>Featured</th>
@@ -79,6 +80,7 @@
                                 $id = $row['id'];
                                 $title = $row['title'];
                                 $price = $row['price'];
+                                $cooking_time = $row['cooking_time'];
                                 $image_name = $row['image_name'];
                                 $featured = $row['featured'];
                                 $active = $row['active'];
@@ -87,7 +89,8 @@
                                 <tr>
                                     <td><?php echo $sn++; ?>. </td>
                                     <td><?php echo $title; ?></td>
-                                    <td>₹<?php echo $price; ?></td>
+                                    <td><?php echo $cooking_time; ?> Minutes</td>
+                                    <td>₨<?php echo $price; ?></td>
                                     <td>
                                         <?php  
                                             //CHeck whether we have image or not

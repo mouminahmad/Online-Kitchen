@@ -40,6 +40,7 @@
                         //Get the Values
                         $id = $row['id'];
                         $title = $row['title'];
+                        $cooking_time = $row['cooking_time'];
                         $description = $row['description'];
                         $price = $row['price'];
                         $image_name = $row['image_name'];
@@ -66,7 +67,10 @@
                             </div>
 
                             <div class="food-menu-desc">
+                            <div style="display: flex; justify-content: space-between;align-items:center;">
                                 <h4><?php echo $title; ?></h4>
+                                <div class="cook-time" style="padding: 8px 7px; background: orange ; border-radius: 5px; color:white;"><?php echo $cooking_time; ?> Minutes</div>
+                            </div>
                                 <p class="food-price">₹<?php echo $price; ?></p>
                                 <p class="food-detail">
                                     <?php echo $description; ?>

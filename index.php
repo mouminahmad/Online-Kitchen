@@ -126,18 +126,27 @@
                         </div>
 
                         <div class="food-menu-desc">
+                        <form  action="manage_cart.php" method="post">
                             <div style="display: flex; justify-content: space-between;align-items:center;">
                                 <h4><?php echo $title; ?></h4>
                                 <div class="cook-time" style="padding: 8px 7px; background: orange; border-radius: 5px; color:white;"><?php echo $cooking_time; ?> Minutes</div>
                             </div>
-                            <p class="food-price">₹<?php echo $price; ?></p>
+                            <p class="food-price">RS <?php echo $price; ?></p>
                             <p class="food-detail">
                                 <?php echo $description; ?>
                             </p>
                             <br>
 
+                            <input type="hidden" value="<?php echo $id; ?>" name="id">
+                                <input type="hidden" value="<?php echo $title; ?>" name="title">
+                                <input type="hidden" value="<?php echo $price; ?>" name="price">
+                                <input type="hidden" value="<?php echo $image_name ?>" name="image_name">
+                                <button type="submit" name="Add_To_Cart"  class="btn btn-primary">Add To Cart</button>
+                                
                             <a href="<?php echo SITEURL; ?>order.php?food_id=<?php echo $id; ?>" class="btn btn-primary">Order Now</a>
+                        </form>
                         </div>
+
                     </div>
 
             <?php

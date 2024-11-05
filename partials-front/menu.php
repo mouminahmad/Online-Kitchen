@@ -2,6 +2,7 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <!-- Important to make website responsive -->
@@ -21,7 +22,7 @@
                     <img src="images/logo.png" alt="Restaurant Logo" class="img-responsive">
                 </a>
             </div>
-<br>
+            <br>
             <div class="menu text-right">
                 <ul>
                     <li>
@@ -33,18 +34,29 @@
                     <li>
                         <a href="<?php echo SITEURL; ?>foods.php">Foods</a>
                     </li>
-                    <li>            
-							<?php
-						if(empty($_SESSION["u_id"]))
-							{
-								echo '<li class="nav-item"><a href="login.php" class="nav-link active">Login</a> </li>';
-							}
-						else
-							{
-                                    echo  '<li class="nav-item"><a href="myorders.php" class="nav-link active">Myorders</a> </li>';
-									echo  '<li class="nav-item"><a href="logout.php" class="nav-link active">Logout</a> </li>';
-							}
-						?>
+                    <?php
+                    $count = 0;
+                    if(isset($_SESSION['cart']))
+                    {
+                        $count = count(($_SESSION['cart']));
+                    }
+                    echo  '<li class="nav-item"><a href="mycart.php" class="nav-link active">My Cart (' . $count . ') </li>';
+                    ?>
+                    <li>
+                        <?php
+                        if (empty($_SESSION["u_id"])) {
+                            echo '<li class="nav-item"><a href="login.php" class="nav-link active">Login</a> </li>';
+                        } else {
+                            $count = 0;
+                            if(isset($_SESSION['cart']))
+                            {
+                                $count = count(($_SESSION['cart']));
+                            }
+                            echo  '<li class="nav-item"><a href="mycart.php" class="nav-link active">My Cart (' . $count . ') </li>';
+                            echo  '<li class="nav-item"><a href="myorders.php" class="nav-link active">Myorders</a> </li>';
+                            echo  '<li class="nav-item"><a href="logout.php" class="nav-link active">Logout</a> </li>';
+                        }
+                        ?>
                     </li>
                 </ul>
             </div>

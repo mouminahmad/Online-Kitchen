@@ -78,7 +78,7 @@ if (!isset($_SESSION['cart'])) {
                 </div>
 
                 <!-- Checkout Button -->
-                <form>
+                <form action="checkout.php" method="post">
                     <!-- Cash on Delivery Option -->
                     <div style="margin-bottom: 20px;">
                         <h3 style="font-size: 1.2em; color: #333;">Payment Method</h3>

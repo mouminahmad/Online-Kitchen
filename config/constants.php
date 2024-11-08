@@ -1,6 +1,9 @@
 <?php 
 //Start Session
-session_start();
+// Check if a session is not already active before starting one
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 //Create Constants to Store Non Repeating Values
 define('SITEURL', 'http://localhost/food-order/'); //Update the home URL of the project if you have changed port number or it's live on server

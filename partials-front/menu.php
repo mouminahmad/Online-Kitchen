@@ -47,13 +47,9 @@
                         if (empty($_SESSION["u_id"])) {
                             echo '<li class="nav-item"><a href="login.php" class="nav-link active">Login</a> </li>';
                         } else {
-                            $count = 0;
-                            if(isset($_SESSION['cart']))
-                            {
-                                $count = count(($_SESSION['cart']));
-                            }
-                            echo  '<li class="nav-item"><a href="mycart.php" class="nav-link active">My Cart (' . $count . ') </li>';
+                           
                             echo  '<li class="nav-item"><a href="myorders.php" class="nav-link active">Myorders</a> </li>';
+                            echo  '<li class="nav-item"><a href="order_details.php" class="nav-link active">Myorders</a> </li>';
                             echo  '<li class="nav-item"><a href="logout.php" class="nav-link active">Logout</a> </li>';
                         }
                         ?>

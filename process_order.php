@@ -7,11 +7,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $voucherNumber = uniqid('VCH-');
     $isPaid = false;
 
-    // Calculate the total price
+    // Calculate the total price, including shipping charge
     $total = 0;
     foreach ($_SESSION['cart'] as $item) {
         $total += $item['price'] * $item['Quantity'];
     }
+
+    // Add shipping charge
+    $shippingCharge = 250;
+    $total += $shippingCharge; // Add shipping charge to the total
 
     // Insert into Orders table
     $stmt = $conn->prepare("INSERT INTO checkout (user_id, total_price, voucher_number, isPaid) VALUES (?, ?, ?, ?)");

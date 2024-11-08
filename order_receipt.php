@@ -13,6 +13,12 @@ if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
         $totalAmount += $item['price'] * $item['Quantity'];
     }
 }
+
+// Define shipping charge (you can make it dynamic based on cart total or location)
+$shipping_charge = 250; // Example fixed shipping charge
+
+// Calculate grand total (total amount + shipping charge)
+$grand_total = $totalAmount + $shipping_charge;
 ?>
 
 <!DOCTYPE html>
@@ -44,9 +50,11 @@ if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
 <h1>Order Receipt</h1>
 <p>Thank you for your order! Your voucher number is: <strong><?php echo $voucherNumber; ?></strong></p>
 <p><strong>Total Amount: RS <?php echo number_format($totalAmount, 2); ?></strong></p>
+<p><strong>Shipping Charges: RS <?php echo number_format($shipping_charge, 2); ?></strong></p>
+<p><strong>Grand Total: RS <?php echo number_format($grand_total, 2); ?></strong></p>
 
 <div class="download-buttons">
-    <a href="generate_receipt_html.php" target="_blank">Download HTML Receipt</a>
+    <a href="generate_receipt_html.php" target="_blank">Download Receipt</a>
 </div>
 
 <form action="upload_voucher.php" method="POST" enctype="multipart/form-data" style="margin-top: 20px;">

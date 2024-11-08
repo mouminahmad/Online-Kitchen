@@ -1,4 +1,3 @@
-
 <?php
 include('partials-front/menu.php');
 
@@ -12,11 +11,10 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
     exit();
 }
 
-
 $userId = $_SESSION['u_id'];
 
-// Fetch all orders for the logged-in user
-$stmt = $conn->prepare("SELECT order_id, total_price, voucher_number, isPaid, order_date FROM checkout WHERE user_id = ? ORDER BY order_date DESC");
+// Fetch all orders for the logged-in user with status and voucher status
+$stmt = $conn->prepare("SELECT order_id, total_price, voucher_number, status, voucher_status, order_date FROM checkout WHERE user_id = ? ORDER BY order_date DESC");
 $stmt->bind_param("i", $userId);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -40,6 +38,12 @@ $result = $stmt->get_result();
         .order-info div { margin-bottom: 10px; }
         .status-paid { color: green; font-weight: bold; }
         .status-pending { color: red; font-weight: bold; }
+        .status-verified { color: blue; font-weight: bold; }
+        .status-rejected { color: orange; font-weight: bold; }
+        .status-shipped { color: #007bff; font-weight: bold; }
+        .status-processing { color: #ffc107; font-weight: bold; }
+        .status-delivered { color: #28a745; font-weight: bold; }
+        .status-cancelled { color: #dc3545; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -54,17 +58,43 @@ $result = $stmt->get_result();
                 
                 <div class="order-info">
                     <div><strong>Date:</strong> <?php echo htmlspecialchars($row['order_date']); ?></div>
-                    <div><strong>Total Price:</strong> $<?php echo htmlspecialchars(number_format($row['total_price'], 2)); ?></div>
+                    <div><strong>Total Price:</strong> RS <?php echo htmlspecialchars(number_format($row['total_price'], 2)); ?></div>
                 </div>
                 
                 <div class="order-info">
                     <div><strong>Voucher Number:</strong> <?php echo htmlspecialchars($row['voucher_number']); ?></div>
                     <div>
                         <strong>Status:</strong> 
-                        <?php if ($row['isPaid']): ?>
-                            <span class="status-paid">Paid</span>
+                        <?php 
+                        switch ($row['status']) {
+                            case 'Shipped':
+                                echo '<span class="status-shipped">Shipped</span>';
+                                break;
+                            case 'Pending':
+                                echo '<span class="status-pending">Pending</span>';
+                                break;
+                            case 'Processing':
+                                echo '<span class="status-processing">Processing</span>';
+                                break;
+                            case 'Delivered':
+                                echo '<span class="status-delivered">Delivered</span>';
+                                break;
+                            case 'Cancelled':
+                                echo '<span class="status-cancelled">Cancelled</span>';
+                                break;
+                            default:
+                                echo '<span class="status-pending">Unknown</span>';
+                        }
+                        ?>
+                    </div>
+                    <div>
+                        <strong>Voucher Status:</strong> 
+                        <?php if ($row['voucher_status'] == 'Verified'): ?>
+                            <span class="status-verified">Verified</span>
+                        <?php elseif ($row['voucher_status'] == 'Rejected'): ?>
+                            <span class="status-rejected">Rejected</span>
                         <?php else: ?>
-                            <span class="status-pending">Pending</span>
+                            <span class="status-pending">Not Verified</span>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -82,4 +112,4 @@ $result = $stmt->get_result();
 $stmt->close();
 $conn->close();
 ?>
-    <?php include('partials-front/footer.php'); ?>
+<?php include('partials-front/footer.php'); ?>

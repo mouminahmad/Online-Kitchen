@@ -10,9 +10,16 @@ $voucherNumber = $_SESSION['voucher_number'];
 $cartItems = $_SESSION['cart'];
 $totalPrice = 0;
 
+// Calculate the total price of the cart items
 foreach ($cartItems as $item) {
     $totalPrice += $item['price'] * $item['Quantity'];
 }
+
+// Define the shipping charge (can be dynamic based on conditions)
+$shippingCharge = 250; // Example fixed shipping charge
+
+// Calculate the grand total (including shipping charges)
+$grandTotal = $totalPrice + $shippingCharge;
 
 // Send headers to download as .html file
 header('Content-Type: text/html');
@@ -60,10 +67,19 @@ foreach ($cartItems as $item) {
     $serialNumber++;
 }
 
+// Display the total price, shipping charges, and grand total
 echo "
     <tr>
         <td colspan='4' class='total'>Total Price</td>
         <td class='total'>Rs. " . number_format($totalPrice, 2) . "</td>
+    </tr>
+    <tr>
+        <td colspan='4' class='total'>Shipping Charges</td>
+        <td class='total'>Rs. " . number_format($shippingCharge, 2) . "</td>
+    </tr>
+    <tr>
+        <td colspan='4' class='total'>Grand Total</td>
+        <td class='total'>Rs. " . number_format($grandTotal, 2) . "</td>
     </tr>
 </table>
 

@@ -70,11 +70,9 @@ if (!isset($_SESSION['cart'])) {
                 <div style="font-size: 1.2em; color: #333; padding: 10px 0;">
                     <strong>Total Price:</strong> RS <?php echo number_format($total, 2); ?>
                 </div>
-                <div style="font-size: 1.2em; color: #333; padding: 10px 0;">
-                    <strong>Tax (5%):</strong> RS <?php echo number_format($total * 0.05, 2); ?>
-                </div>
+                <!-- Tax removed -->
                 <div style="font-size: 1.2em; color: #333; padding: 10px 0; font-weight: bold;">
-                    <strong>Grand Total:</strong> RS <?php echo number_format($total + ($total * 0.05), 2); ?>
+                    <strong>Grand Total:</strong> RS <?php echo number_format($total, 2); ?>
                 </div>
 
                 <!-- Checkout Button -->
@@ -86,7 +84,7 @@ if (!isset($_SESSION['cart'])) {
                         <!-- Cash on Delivery Radio Button -->
                         <label style="font-size: 1.1em; margin-right: 20px;">
                             <input type="radio" name="payment_method" value="cash_on_delivery" style="margin-right: 10px;" checked>
-                            Cash on Delivery
+                            Online Payment
                         </label>
                     </div>
 
@@ -100,6 +98,5 @@ if (!isset($_SESSION['cart'])) {
         </div>
     </div>
 </div>
-
 
 <?php include('partials-front/footer.php'); ?>

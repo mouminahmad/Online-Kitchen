@@ -24,19 +24,16 @@ include('partials-front/menu.php');
 // Calculate total price
 $total = 0;
 foreach ($_SESSION['cart'] as $item) {
+    print_r($item);
     $total += $item['price'] * $item['Quantity'];
 }
-
-// Add shipping charge of RS 250
-$shipping_charge = 250;
-$grand_total = $total + $shipping_charge;
 ?>
 
 <div class="main-content" style="background-color: #f7f7f7; padding: 40px 0;">
     <div class="wrapper" style="width: 90%; margin: 0 auto; background-color: #fff; padding: 20px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
         <h1 class="text-center" style="color: #333; font-size: 2em; margin-bottom: 20px;">Checkout</h1>
 
-        <form action="process_order.php" method="POST" style="display: flex; flex-wrap: wrap; gap: 20px;">
+        <form action="process_order.php" method="post" style="display: flex; flex-wrap: wrap; gap: 20px;">
 
             <!-- Shipping Information Column -->
             <div style="flex: 1; min-width: 300px; padding: 20px; border-right: 1px solid #ddd; background-color: #fafafa; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);">
@@ -101,8 +98,6 @@ $grand_total = $total + $shipping_charge;
                 <!-- Price Details -->
                 <div style="padding: 10px 0; border-top: 1px solid #ddd; margin-top: 20px;">
                     <p style="font-size: 1.2em; color: #333; margin-bottom: 10px;">Total Price: <strong>RS <?php echo number_format($total, 2); ?></strong></p>
-                    <p style="font-size: 1.2em; color: #333; margin-bottom: 10px;">Shipping Charge: <strong>RS <?php echo number_format($shipping_charge, 2); ?></strong></p>
-                    <p style="font-size: 1.5em; color: #4CAF50; margin-bottom: 20px;">Grand Total: <strong>RS <?php echo number_format($grand_total, 2); ?></strong></p>
                 </div>
 
                 <!-- Confirm Order Button -->

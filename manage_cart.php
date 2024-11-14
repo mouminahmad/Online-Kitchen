@@ -24,6 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 'title' => $_POST['title'],
                 'price' => $_POST['price'],
                 'image_name' => $_POST['image_name'],
+                'cooking_time' => $_POST['cooking_time'],
                 'Quantity' => 1
             );
             echo "<script>

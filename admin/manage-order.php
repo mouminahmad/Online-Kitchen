@@ -1,189 +1,391 @@
-<?php 
+<?php
 include('partials/menu.php');
 
-
-// Update order status functionality
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
+if (isset($_POST['submitted']) && $_POST['submitted'] == 1) {
     $order_id = filter_input(INPUT_POST, 'order_id', FILTER_SANITIZE_NUMBER_INT);
-    $new_status = filter_input(INPUT_POST, 'status', FILTER_SANITIZE_STRING);
-    
-    if (!empty($order_id) && !empty($new_status)) {
-        $sql_update = "UPDATE checkout SET status = ? WHERE order_id = ?";
-        $stmt = $conn->prepare($sql_update);
-        $stmt->bind_param('si', $new_status, $order_id);
+    $shipping_charges = filter_input(INPUT_POST, 'shipping_charges', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+    $delivery_time = filter_input(INPUT_POST, 'delivery_time', FILTER_SANITIZE_STRING);
+
+    if ($order_id && $shipping_charges && $delivery_time) {
+        // Check if voucher already exists
+        $stmt = $conn->prepare("SELECT voucher_number FROM checkout WHERE order_id = ?");
+        $stmt->bind_param("i", $order_id);
         $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result && $result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $existing_voucher = $row['voucher_number'];
+        
+            // Check if voucher is NULL or empty
+            if (empty($existing_voucher) || $existing_voucher === 'N/A') {
+                // Generate a new voucher
+                $voucher_number = 'OK-' . strtoupper(substr(md5(uniqid('', true)), 0, 6));
+        
+                // Prepare the UPDATE query to save the new voucher
+                $stmt = $conn->prepare("UPDATE checkout SET voucher_number = ?, shipping_charges = ? WHERE order_id = ?");
+                $stmt->bind_param("sdi", $voucher_number, $shipping_charges, $order_id);
+        
+                if ($stmt->execute()) {
+                    // Redirect after successful operation
+                    header("Location: manage-orders.php");
+                    exit();
+                } else {
+                    echo "<p>Error executing update: " . $stmt->error . "</p>";
+                }
+            } else {
+                // Voucher already exists, handle as needed
+                header("Location: manage-orders.php");
+                exit();
+            }
+        } else {
+            echo "<p>Order not found with ID $order_id</p>";
+        }
     }
 }
 
-// Update voucher status functionality (admin verifying voucher)
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_voucher_status'])) {
-    $order_id = filter_input(INPUT_POST, 'order_id', FILTER_SANITIZE_NUMBER_INT);
-    $voucher_status = filter_input(INPUT_POST, 'voucher_status', FILTER_SANITIZE_STRING); // 'Verified' or 'Rejected'
-    
-    if (!empty($order_id) && !empty($voucher_status)) {
-        $sql_update_voucher = "UPDATE checkout SET voucher_status = ? WHERE order_id = ?";
-        $stmt = $conn->prepare($sql_update_voucher);
-        $stmt->bind_param('si', $voucher_status, $order_id);
-        $stmt->execute();
-    }
-}
 
-// Delete order functionality
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_order'])) {
-    $order_id = filter_input(INPUT_POST, 'order_id', FILTER_SANITIZE_NUMBER_INT);
-    
-    if (!empty($order_id)) {
-        $sql_delete = "DELETE FROM checkout WHERE order_id = ?";
-        $stmt = $conn->prepare($sql_delete);
-        $stmt->bind_param('i', $order_id);
-        $stmt->execute();
-    }
-}
 
-// Retrieve orders and items
-$sql = "SELECT c.order_id, c.user_id, c.total_price, c.voucher_number, c.isPaid, c.order_date, c.status, c.voucher_status,
-               vu.voucher_image, vu.voucher_status AS voucher_upload_status,
-               ci.product_id, ci.quantity, ci.price
-        FROM checkout c
-        LEFT JOIN checkout_items ci ON c.order_id = ci.order_id
-        LEFT JOIN voucher_uploads vu ON c.order_id = vu.order_id
-        ORDER BY c.order_date DESC";
-$result = $conn->query($sql);
+
+
+
+
+
+
+
+
+// Retrieve orders
+$sql_orders = "
+    SELECT 
+        c.order_id, 
+        c.user_id, 
+        c.total_price, 
+        c.voucher_number, 
+        c.isPaid, 
+        c.order_date, 
+        c.status, 
+        c.voucher_status,
+        c.shipping_name,       -- Added shipping name
+        c.shipping_address,    -- Added shipping address
+        c.shipping_phone,      -- Added shipping phone
+        vu.voucher_image, 
+        vu.voucher_status AS voucher_upload_status
+    FROM checkout c
+    LEFT JOIN voucher_uploads vu ON c.order_id = vu.order_id
+    ORDER BY c.order_date DESC
+";
+$result_orders = $conn->query($sql_orders);
+
+
+
+
+
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Admin Order Management</title>
     <style>
-        /* Styling for the page */
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        th, td { padding: 10px; text-align: left; border: 1px solid #ddd; }
-        th { background-color: #f4f4f4; }
-        tr:nth-child(even) { background-color: #f9f9f9; }
-        .button { padding: 5px 10px; text-decoration: none; cursor: pointer; }
-        .update-btn { background-color: #4CAF50; color: white; }
-        .delete-btn { background-color: #f44336; color: white; }
-        .details-btn { background-color: #2196F3; color: white; }
-        select { padding: 5px; }
-        .voucher-image { max-width: 150px; }
+        /* Basic styling for the table and modal */
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        table {
+            width: 90%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+
+        td {
+            text-align: center;
+        }
+
+        .button {
+            padding: 6px 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            overflow: auto;
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 50%;
+            border-radius: 5px;
+            text-align: left;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            overflow: auto;
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 40%;
+            border: 1px solid #888;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .voucher-title {
+            font-size: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #007bff;
+        }
+
+        .voucher-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .form-group {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+        }
+
+        .form-input:focus {
+            border-color: #007bff;
+            outline: none;
+        }
     </style>
 </head>
+
 <body>
 
-<h1>Admin Order Management</h1>
+    <h1>Admin Order Management</h1>
 
-<table>
-    <thead>
-        <tr>
-            <th>Order ID</th>
-            <th>User ID</th>
-            <th>Total Price</th>
-            <th>Voucher Number</th>
-            <th>Voucher Image</th>
-            <th>Voucher Status</th>
-            <th>Order Date</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php if ($result->num_rows > 0): ?>
-            <?php while ($row = $result->fetch_assoc()): ?> 
+    <table>
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>User ID</th>
+                <th>Total Price</th>
+                <th>Voucher Image</th>
+                <th>Voucher Status</th>
+                <th>Order Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+                <th>Generate Voucher</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if ($result_orders->num_rows > 0): ?>
+                <?php while ($row = $result_orders->fetch_assoc()): ?>
+                    <tr>
+                        <td><?php echo $row['order_id']; ?></td>
+                        <td><?php echo $row['user_id']; ?></td>
+                        <td><?php echo number_format($row['total_price'], 2); ?></td>
+                        <td>
+                            <?php if (!empty($row['voucher_image'])): ?>
+                                <img src="../images/uploads_vouchers/<?php echo $row['voucher_image']; ?>" alt="Voucher Image" width="50">
+                            <?php else: ?>
+                                No image
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <form method="post">
+                                <input type="hidden" name="order_id" value="<?php echo $row['order_id']; ?>">
+                                <select name="voucher_status">
+                                    <option value="Unverified" <?php if ($row['voucher_status'] == 'Unverified') echo 'selected'; ?>>Unverified</option>
+                                    <option value="Verified" <?php if ($row['voucher_status'] == 'Verified') echo 'selected'; ?>>Verified</option>
+                                    <option value="Rejected" <?php if ($row['voucher_status'] == 'Rejected') echo 'selected'; ?>>Rejected</option>
+                                </select>
+                                <button type="submit" name="update_voucher_status" class="button">Update</button>
+                            </form>
+                        </td>
+                        <td><?php echo $row['order_date']; ?></td>
+                        <td>
+                            <form method="post">
+                                <input type="hidden" name="order_id" value="<?php echo $row['order_id']; ?>">
+                                <select name="status">
+                                    <option value="Pending" <?php if ($row['status'] == 'Pending') echo 'selected'; ?>>Pending</option>
+                                    <option value="Processing" <?php if ($row['status'] == 'Processing') echo 'selected'; ?>>Processing</option>
+                                    <option value="Shipped" <?php if ($row['status'] == 'Shipped') echo 'selected'; ?>>Shipped</option>
+                                    <option value="Delivered" <?php if ($row['status'] == 'Delivered') echo 'selected'; ?>>Delivered</option>
+                                    <option value="Cancelled" <?php if ($row['status'] == 'Cancelled') echo 'selected'; ?>>Cancelled</option>
+                                </select>
+                                <button type="submit" name="update_status" class="button">Update</button>
+                            </form>
+                        </td>
+                        <td>
+                            <button onclick="showDetails(<?php echo $row['order_id']; ?>)" class="button">Details</button>
+                            <form method="post" style="display: inline;">
+                                <input type="hidden" name="order_id" value="<?php echo $row['order_id']; ?>">
+                                <button type="submit" name="delete_order" class="button" onclick="return confirm('Are you sure?')">Delete</button>
+                            </form>
+                        </td>
+                        <td>
+                            <?php if ($row['voucher_number'] === 'N/A'): ?>
+                                <button onclick="openVoucherForm(<?php echo $row['order_id']; ?>, '<?php echo htmlspecialchars($row['shipping_name']); ?>', '<?php echo htmlspecialchars($row['shipping_phone']); ?>', '<?php echo htmlspecialchars($row['shipping_address']); ?>')" class="button">Generate Voucher</button>
+                            <?php else: ?>
+                                <span><?php echo $row['voucher_number']; ?></span>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                <?php endwhile; ?>
+            <?php else: ?>
                 <tr>
-                    <td><?php echo $row['order_id']; ?></td>
-                    <td><?php echo $row['user_id']; ?></td>
-                    <td><?php echo number_format($row['total_price'], 2); ?></td>
-                    <td><?php echo $row['voucher_number']; ?></td>
-                    <td>
-                        <?php if (!empty($row['voucher_image'])): ?>
-                            <img src="../images/uploads_vouchers/<?php echo $row['voucher_image']; ?>" alt="Voucher Image" class="voucher-image">
-                        <?php else: ?>
-                            No image uploaded
-                        <?php endif; ?>
-                    </td>
-                    <td>
-                        <!-- Voucher Status dropdown -->
-                        <form method="post" style="display: inline;">
-                            <input type="hidden" name="order_id" value="<?php echo $row['order_id']; ?>">
-                            <select name="voucher_status">
-                                <option value="Unverified" <?php if ($row['voucher_status'] == 'Unverified') echo 'selected'; ?>>Unverified</option>
-                                <option value="Verified" <?php if ($row['voucher_status'] == 'Verified') echo 'selected'; ?>>Verified</option>
-                                <option value="Rejected" <?php if ($row['voucher_status'] == 'Rejected') echo 'selected'; ?>>Rejected</option>
-                            </select>
-                            <button type="submit" name="update_voucher_status" class="button update-btn">Update Voucher Status</button>
-                        </form>
-                    </td>
-                    <td><?php echo $row['order_date']; ?></td>
-                    <td>
-                        <!-- Order Status update -->
-                        <form method="post" style="display: inline;">
-                            <input type="hidden" name="order_id" value="<?php echo $row['order_id']; ?>">
-                            <select name="status">
-                                <option value="Pending" <?php if ($row['status'] == 'Pending') echo 'selected'; ?>>Pending</option>
-                                <option value="Processing" <?php if ($row['status'] == 'Processing') echo 'selected'; ?>>Processing</option>
-                                <option value="Shipped" <?php if ($row['status'] == 'Shipped') echo 'selected'; ?>>Shipped</option>
-                                <option value="Delivered" <?php if ($row['status'] == 'Delivered') echo 'selected'; ?>>Delivered</option>
-                                <option value="Cancelled" <?php if ($row['status'] == 'Cancelled') echo 'selected'; ?>>Cancelled</option>
-                            </select>
-                            <button type="submit" name="update_status" class="button update-btn">Update Status</button>
-                        </form>
-                    </td>
-                    <td>
-                        <button onclick="showDetails(<?php echo $row['order_id']; ?>)" class="button details-btn">View Details</button>
-                        <form method="post" style="display: inline;">
-                            <input type="hidden" name="order_id" value="<?php echo $row['order_id']; ?>">
-                            <button type="submit" name="delete_order" class="button delete-btn" onclick="return confirm('Are you sure you want to delete this order?')">Delete</button>
-                        </form>
-                    </td>
+                    <td colspan="9">No orders found.</td>
                 </tr>
-                <tr id="details-<?php echo $row['order_id']; ?>" style="display: none;">
-                    <td colspan="8">
-                        <!-- Order Item Details -->
-                        <table style="width: 100%; margin-top: 10px;">
-                            <thead>
-                                <tr>
-                                    <th>Product ID</th>
-                                    <th>Quantity</th>
-                                    <th>Price</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php
-                                $order_id = $row['order_id'];
-                                $sql_items = "SELECT * FROM checkout_items WHERE order_id = ?";
-                                $stmt_items = $conn->prepare($sql_items);
-                                $stmt_items->bind_param('i', $order_id);
-                                $stmt_items->execute();
-                                $result_items = $stmt_items->get_result();
-                                while ($item = $result_items->fetch_assoc()):
-                                ?>
-                                    <tr>
-                                        <td><?php echo $item['product_id']; ?></td>
-                                        <td><?php echo $item['quantity']; ?></td>
-                                        <td><?php echo number_format($item['price'], 2); ?></td>
-                                    </tr>
-                                <?php endwhile; ?>
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
-            <?php endwhile; ?>
-        <?php endif; ?>
-    </tbody>
-</table>
+            <?php endif; ?>
+        </tbody>
+    </table>
 
-<script>
-// Toggle visibility of order details
-function showDetails(orderId) {
-    var detailsRow = document.getElementById('details-' + orderId);
-    detailsRow.style.display = detailsRow.style.display === 'none' ? 'table-row' : 'none';
+    <!-- Popup Form -->
+    <!-- Popup Form for Generating Voucher -->
+    <div id="voucherForm" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeVoucherForm()">&times;</span>
+            <h2 class="voucher-title">Generate Voucher</h2>
+            <form method="post" class="voucher-form">
+                <input type="hidden" name="order_id" id="order_id">
+                <div class="form-group">
+                    <label for="customer_name">Customer Name:</label>
+                    <input type="text" id="customer_name" class="form-input" readonly value="<?php echo htmlspecialchars($shipping_name); ?>">
+                </div>
+
+                <div class="form-group">
+                    <label for="customer_phone">Phone:</label>
+                    <input type="text" id="customer_phone" class="form-input" readonly value="<?php echo htmlspecialchars($shipping_phone); ?>">
+                </div>
+
+                <div class="form-group">
+                    <label for="customer_address">Address:</label>
+                    <input type="text" id="customer_address" class="form-input" readonly value="<?php echo htmlspecialchars($shipping_address); ?>">
+                </div>
+
+                <div class="form-group">
+                    <label for="shipping_charges">Shipping Charges:</label>
+                    <input type="number" name="shipping_charges" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="delivery_time">Delivery Time (days):</label>
+                    <input type="number" name="delivery_time" class="form-input" required>
+                </div>
+                <input type="hidden" name="submitted" value="1">
+                <button type="submit" name="submit_voucher" class="button">Generate Voucher</button>
+            </form>
+        </div>
+    </div>
+
+
+    <script>
+        function openVoucherForm(orderId, shippingName, shippingPhone, shippingAddress) {
+    // Open modal and prefill data
+    document.getElementById('voucherForm').style.display = 'block';
+    document.getElementById('order_id').value = orderId;
+    document.getElementById('customer_name').value = shippingName; // Corrected this line
+    document.getElementById('customer_phone').value = shippingPhone;
+    document.getElementById('customer_address').value = shippingAddress;
 }
-</script>
+
+        function closeVoucherForm() {
+            document.getElementById('voucherForm').style.display = 'none';
+        }
+    </script>
 
 </body>
-</html>
 
-<?php $conn->close(); ?>
+</html>

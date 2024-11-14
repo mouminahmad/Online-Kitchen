@@ -83,6 +83,7 @@
                                 <input type="hidden" value="<?php echo $title; ?>" name="title">
                                 <input type="hidden" value="<?php echo $price; ?>" name="price">
                                 <input type="hidden" value="<?php echo $image_name ?>" name="image_name">
+                                <input type="hidden" value="<?php echo $cooking_time ?>" name="cooking_time">
                                 <button type="submit" name="Add_To_Cart"  class="btn btn-primary">Add To Cart</button>
                                 
                                 <a href="<?php echo SITEURL; ?>order.php?food_id=<?php echo $id; ?>" class="btn btn-primary">Order Now</a>

@@ -1,31 +1,55 @@
 <?php
-include('partials/menu.php');
+include "partials/menu.php";
 
-if (isset($_POST['submitted']) && $_POST['submitted'] == 1) {
-    $order_id = filter_input(INPUT_POST, 'order_id', FILTER_SANITIZE_NUMBER_INT);
-    $shipping_charges = filter_input(INPUT_POST, 'shipping_charges', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
-    $delivery_time = filter_input(INPUT_POST, 'delivery_time', FILTER_SANITIZE_STRING);
+if (isset($_POST["submitted"]) && $_POST["submitted"] == 1) {
+    $order_id = filter_input(
+        INPUT_POST,
+        "order_id",
+        FILTER_SANITIZE_NUMBER_INT
+    );
 
+    $shipping_charges = filter_input(
+        INPUT_POST,
+        "shipping_charges",
+        FILTER_SANITIZE_NUMBER_FLOAT,
+        FILTER_FLAG_ALLOW_FRACTION
+    );
+    $delivery_time = filter_input(
+        INPUT_POST,
+        "delivery_time",
+        FILTER_SANITIZE_STRING
+    );
 
     if ($order_id && $shipping_charges && $delivery_time) {
         // Check if voucher already exists
-        $stmt = $conn->prepare("SELECT voucher_number FROM checkout WHERE order_id = ?");
+        $stmt = $conn->prepare(
+            "SELECT voucher_number FROM checkout WHERE order_id = ?"
+        );
         $stmt->bind_param("i", $order_id);
         $stmt->execute();
         $result = $stmt->get_result();
 
         if ($result && $result->num_rows > 0) {
             $row = $result->fetch_assoc();
-            $existing_voucher = $row['voucher_number'];
+            $existing_voucher = $row["voucher_number"];
 
             // Check if voucher is NULL or empty
-            if (empty($existing_voucher) || $existing_voucher === 'N/A') {
+            if (empty($existing_voucher) || $existing_voucher === "N/A") {
                 // Generate a new voucher
-                $voucher_number = 'OK-' . strtoupper(substr(md5(uniqid('', true)), 0, 6));
+                $voucher_number =
+                    "OK-" . strtoupper(substr(md5(uniqid("", true)), 0, 6));
 
                 // Prepare the UPDATE query to save the new voucher
-                $stmt = $conn->prepare("UPDATE checkout SET voucher_number = ?, shipping_charges = ?, delivery_time = ? WHERE order_id = ?");
-                $stmt->bind_param("sdii", $voucher_number, $shipping_charges, $delivery_time, $order_id);
+                $stmt = $conn->prepare(
+                    "UPDATE checkout SET voucher_number = ?, shipping_charges = ?, delivery_time = ? WHERE order_id = ?"
+                );
+                $stmt->bind_param(
+                    "sdii",
+                    $voucher_number,
+                    $shipping_charges,
+                    $delivery_time,
+                    $order_id
+                );
 
                 if ($stmt->execute()) {
                     // Redirect after successful operation
@@ -45,13 +69,21 @@ if (isset($_POST['submitted']) && $_POST['submitted'] == 1) {
     }
 }
 
+if (isset($_POST["update_voucher_status"])) {
+    $order_id = filter_input(
+        INPUT_POST,
+        "order_id",
+        FILTER_SANITIZE_NUMBER_INT
+    );
+    $voucher_status = filter_input(
+        INPUT_POST,
+        "voucher_status",
+        FILTER_SANITIZE_STRING
+    );
 
-
-if (isset($_POST['update_voucher_status'])) {
-    $order_id = filter_input(INPUT_POST, 'order_id', FILTER_SANITIZE_NUMBER_INT);
-    $voucher_status = filter_input(INPUT_POST, 'voucher_status', FILTER_SANITIZE_STRING);
-
-    $stmt = $conn->prepare("UPDATE checkout SET voucher_status = ? WHERE order_id = ?");
+    $stmt = $conn->prepare(
+        "UPDATE checkout SET voucher_status = ? WHERE order_id = ?"
+    );
     $stmt->bind_param("si", $voucher_status, $order_id);
     if ($stmt->execute()) {
         echo "<p>Voucher status updated successfully.</p>";
@@ -60,11 +92,14 @@ if (isset($_POST['update_voucher_status'])) {
     }
 }
 
-
 // Update Order Status
-if (isset($_POST['update_status'])) {
-    $order_id = filter_input(INPUT_POST, 'order_id', FILTER_SANITIZE_NUMBER_INT);
-    $status = filter_input(INPUT_POST, 'status', FILTER_SANITIZE_STRING);
+if (isset($_POST["update_status"])) {
+    $order_id = filter_input(
+        INPUT_POST,
+        "order_id",
+        FILTER_SANITIZE_NUMBER_INT
+    );
+    $status = filter_input(INPUT_POST, "status", FILTER_SANITIZE_STRING);
 
     $stmt = $conn->prepare("UPDATE checkout SET status = ? WHERE order_id = ?");
     $stmt->bind_param("si", $status, $order_id);
@@ -76,6 +111,25 @@ if (isset($_POST['update_status'])) {
 }
 
 
+
+// Check if delete action is triggered
+if (isset($_POST['delete_order'])) {
+    $order_id = filter_input(INPUT_POST, 'order_id', FILTER_SANITIZE_NUMBER_INT);
+
+    if ($order_id) {
+        // Prepare the DELETE query
+        $stmt = $conn->prepare("DELETE FROM checkout WHERE order_id = ?");
+        $stmt->bind_param("i", $order_id);
+
+        if ($stmt->execute()) {
+            // If deletion is successful, redirect to manage orders page
+            header("Location: manage-order.php");
+            exit();
+        } else {
+            echo "<p>Error deleting order: " . $stmt->error . "</p>";
+        }
+    }
+}
 
 
 
@@ -100,11 +154,6 @@ $sql_orders = "
     ORDER BY c.order_date DESC
 ";
 $result_orders = $conn->query($sql_orders);
-
-
-
-
-
 ?>
 
 <!DOCTYPE html>
@@ -308,37 +357,78 @@ $result_orders = $conn->query($sql_orders);
             <?php if ($result_orders->num_rows > 0): ?>
                 <?php while ($row = $result_orders->fetch_assoc()): ?>
                     <tr>
-                        <td><?php echo $row['order_id']; ?></td>
-                        <td><?php echo $row['user_id']; ?></td>
-                        <td><?php echo number_format($row['total_price'], 2); ?></td>
+                        <td><?php echo $row["order_id"]; ?></td>
+                        <td><?php echo $row["user_id"]; ?></td>
+                        <td><?php echo number_format(
+                            $row["total_price"],
+                            2
+                        ); ?></td>
                         <td>
-                            <?php if (!empty($row['voucher_image'])): ?>
-                                <img src="../images/uploads_vouchers/<?php echo $row['voucher_image']; ?>" alt="Voucher Image" width="50">
+                            <?php if (!empty($row["voucher_image"])): ?>
+                                <img src="../images/uploads_vouchers/<?php echo $row[
+                                    "voucher_image"
+                                ]; ?>" alt="Voucher Image" width="50">
                             <?php else: ?>
                                 No image
                             <?php endif; ?>
                         </td>
                         <td>
                             <form method="post">
-                                <input type="hidden" name="order_id" value="<?php echo $row['order_id']; ?>">
+                                <input type="hidden" name="order_id" value="<?php echo $row[
+                                    "order_id"
+                                ]; ?>">
                                 <select name="voucher_status">
-                                    <option value="Unverified" <?php if ($row['voucher_status'] == 'Unverified') echo 'selected'; ?>>Unverified</option>
-                                    <option value="Verified" <?php if ($row['voucher_status'] == 'Verified') echo 'selected'; ?>>Verified</option>
-                                    <option value="Rejected" <?php if ($row['voucher_status'] == 'Rejected') echo 'selected'; ?>>Rejected</option>
+                                    <option value="Unverified" <?php if (
+                                        $row["voucher_status"] == "Unverified"
+                                    ) {
+                                        echo "selected";
+                                    } ?>>Unverified</option>
+                                    <option value="Verified" <?php if (
+                                        $row["voucher_status"] == "Verified"
+                                    ) {
+                                        echo "selected";
+                                    } ?>>Verified</option>
+                                    <option value="Rejected" <?php if (
+                                        $row["voucher_status"] == "Rejected"
+                                    ) {
+                                        echo "selected";
+                                    } ?>>Rejected</option>
                                 </select>
                                 <button type="submit" name="update_voucher_status" class="button">Update</button>
                             </form>
                         </td>
-                        <td><?php echo $row['order_date']; ?></td>
+                        <td><?php echo $row["order_date"]; ?></td>
                         <td>
                             <form method="post">
-                                <input type="hidden" name="order_id" value="<?php echo $row['order_id']; ?>">
+                                <input type="hidden" name="order_id" value="<?php echo $row[
+                                    "order_id"
+                                ]; ?>">
                                 <select name="status">
-                                    <option value="Pending" <?php if ($row['status'] == 'Pending') echo 'selected'; ?>>Pending</option>
-                                    <option value="Processing" <?php if ($row['status'] == 'Processing') echo 'selected'; ?>>Processing</option>
-                                    <option value="Shipped" <?php if ($row['status'] == 'Shipped') echo 'selected'; ?>>Shipped</option>
-                                    <option value="Delivered" <?php if ($row['status'] == 'Delivered') echo 'selected'; ?>>Delivered</option>
-                                    <option value="Cancelled" <?php if ($row['status'] == 'Cancelled') echo 'selected'; ?>>Cancelled</option>
+                                    <option value="Pending" <?php if (
+                                        $row["status"] == "Pending"
+                                    ) {
+                                        echo "selected";
+                                    } ?>>Pending</option>
+                                    <option value="Processing" <?php if (
+                                        $row["status"] == "Processing"
+                                    ) {
+                                        echo "selected";
+                                    } ?>>Processing</option>
+                                    <option value="Shipped" <?php if (
+                                        $row["status"] == "Shipped"
+                                    ) {
+                                        echo "selected";
+                                    } ?>>Shipped</option>
+                                    <option value="Delivered" <?php if (
+                                        $row["status"] == "Delivered"
+                                    ) {
+                                        echo "selected";
+                                    } ?>>Delivered</option>
+                                    <option value="Cancelled" <?php if (
+                                        $row["status"] == "Cancelled"
+                                    ) {
+                                        echo "selected";
+                                    } ?>>Cancelled</option>
                                 </select>
                                 <button type="submit" name="update_status" class="button">Update</button>
                             </form>
@@ -346,35 +436,39 @@ $result_orders = $conn->query($sql_orders);
                         <td>
                             <button
                                 onclick="showDetails(
-        <?php echo $row['order_id']; ?>,
-        <?php echo $row['user_id']; ?>,
-        '<?php echo number_format($row['total_price'], 2); ?>',
-        '<?php echo htmlspecialchars($row['shipping_name']); ?>',
-        '<?php echo htmlspecialchars($row['shipping_address']); ?>',
-        '<?php echo htmlspecialchars($row['shipping_phone']); ?>',
-        '<?php echo htmlspecialchars($row['voucher_number']); ?>',
-        '<?php echo $row['order_date']; ?>',
-        '<?php echo $row['status']; ?>'
+        <?php echo $row["order_id"]; ?>,
+        <?php echo $row["user_id"]; ?>,
+        '<?php echo number_format($row["total_price"], 2); ?>',
+        '<?php echo htmlspecialchars($row["shipping_name"]); ?>',
+        '<?php echo htmlspecialchars($row["shipping_address"]); ?>',
+        '<?php echo htmlspecialchars($row["shipping_phone"]); ?>',
+        '<?php echo htmlspecialchars($row["voucher_number"]); ?>',
+        '<?php echo $row["order_date"]; ?>',
+        '<?php echo $row["status"]; ?>'
     )"
                                 class="button">
                                 Details
                             </button>
                             <form method="post" style="display: inline;">
-                                <input type="hidden" name="order_id" value="<?php echo $row['order_id']; ?>">
+                                <input type="hidden" name="order_id" value="<?php echo $row[
+                                    "order_id"
+                                ]; ?>">
                                 <button type="submit" name="delete_order" class="button" onclick="return confirm('Are you sure?')">Delete</button>
                             </form>
                         </td>
                         <td>
-                            <?php if ($row['voucher_number'] === 'N/A'): ?>
+                            <?php if ($row["voucher_number"] === "N/A"): ?>
                                 <button onclick="openVoucherForm(
-    <?php echo $row['order_id']; ?>, 
-    '<?php echo htmlspecialchars($row['shipping_name']); ?>', 
-    '<?php echo htmlspecialchars($row['shipping_phone']); ?>', 
-    '<?php echo htmlspecialchars($row['shipping_address']); ?>', 
-    '<?php echo htmlspecialchars($row['total_price']); ?>'
+    <?php echo $row["order_id"]; ?>, 
+    '<?php echo htmlspecialchars($row["shipping_name"]); ?>', 
+    '<?php echo htmlspecialchars($row["shipping_phone"]); ?>', 
+    '<?php echo htmlspecialchars($row["shipping_address"]); ?>', 
+    '<?php echo htmlspecialchars($row["total_price"]); ?>'
 )" class="button">Generate Voucher</button>
                             <?php else: ?>
-                                <span><?php echo $row['voucher_number']; ?></span>
+                                <span><?php echo $row[
+                                    "voucher_number"
+                                ]; ?></span>
                             <?php endif; ?>
                         </td>
                     </tr>

@@ -332,6 +332,25 @@ $result_orders = $conn->query($sql_orders);
         .form-group {
             flex: 1;
         }
+        
+
+        /* Close button styles */
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #f44336;
+            text-decoration: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -360,39 +379,36 @@ $result_orders = $conn->query($sql_orders);
                         <td><?php echo $row["order_id"]; ?></td>
                         <td><?php echo $row["user_id"]; ?></td>
                         <td><?php echo number_format(
-                            $row["total_price"],
-                            2
-                        ); ?></td>
+                                $row["total_price"],
+                                2
+                            ); ?></td>
                         <td>
                             <?php if (!empty($row["voucher_image"])): ?>
-                                <img src="../images/uploads_vouchers/<?php echo $row[
-                                    "voucher_image"
-                                ]; ?>" alt="Voucher Image" width="50">
+                                <img src="../images/uploads_vouchers/<?php echo $row['voucher_image']; ?>" alt="Voucher Image" width="50" onclick="showimage('../images/uploads_vouchers/<?php echo $row['voucher_image']; ?>')">
                             <?php else: ?>
                                 No image
                             <?php endif; ?>
                         </td>
+
                         <td>
                             <form method="post">
-                                <input type="hidden" name="order_id" value="<?php echo $row[
-                                    "order_id"
-                                ]; ?>">
+                                <input type="hidden" name="order_id" value="<?php echo $row["order_id"]; ?>">
                                 <select name="voucher_status">
                                     <option value="Unverified" <?php if (
-                                        $row["voucher_status"] == "Unverified"
-                                    ) {
-                                        echo "selected";
-                                    } ?>>Unverified</option>
+                                                                    $row["voucher_status"] == "Unverified"
+                                                                ) {
+                                                                    echo "selected";
+                                                                } ?>>Unverified</option>
                                     <option value="Verified" <?php if (
-                                        $row["voucher_status"] == "Verified"
-                                    ) {
-                                        echo "selected";
-                                    } ?>>Verified</option>
+                                                                    $row["voucher_status"] == "Verified"
+                                                                ) {
+                                                                    echo "selected";
+                                                                } ?>>Verified</option>
                                     <option value="Rejected" <?php if (
-                                        $row["voucher_status"] == "Rejected"
-                                    ) {
-                                        echo "selected";
-                                    } ?>>Rejected</option>
+                                                                    $row["voucher_status"] == "Rejected"
+                                                                ) {
+                                                                    echo "selected";
+                                                                } ?>>Rejected</option>
                                 </select>
                                 <button type="submit" name="update_voucher_status" class="button">Update</button>
                             </form>
@@ -400,35 +416,33 @@ $result_orders = $conn->query($sql_orders);
                         <td><?php echo $row["order_date"]; ?></td>
                         <td>
                             <form method="post">
-                                <input type="hidden" name="order_id" value="<?php echo $row[
-                                    "order_id"
-                                ]; ?>">
+                                <input type="hidden" name="order_id" value="<?php echo $row["order_id"]; ?>">
                                 <select name="status">
                                     <option value="Pending" <?php if (
-                                        $row["status"] == "Pending"
-                                    ) {
-                                        echo "selected";
-                                    } ?>>Pending</option>
+                                                                $row["status"] == "Pending"
+                                                            ) {
+                                                                echo "selected";
+                                                            } ?>>Pending</option>
                                     <option value="Processing" <?php if (
-                                        $row["status"] == "Processing"
-                                    ) {
-                                        echo "selected";
-                                    } ?>>Processing</option>
+                                                                    $row["status"] == "Processing"
+                                                                ) {
+                                                                    echo "selected";
+                                                                } ?>>Processing</option>
                                     <option value="Shipped" <?php if (
-                                        $row["status"] == "Shipped"
-                                    ) {
-                                        echo "selected";
-                                    } ?>>Shipped</option>
+                                                                $row["status"] == "Shipped"
+                                                            ) {
+                                                                echo "selected";
+                                                            } ?>>Shipped</option>
                                     <option value="Delivered" <?php if (
-                                        $row["status"] == "Delivered"
-                                    ) {
-                                        echo "selected";
-                                    } ?>>Delivered</option>
+                                                                    $row["status"] == "Delivered"
+                                                                ) {
+                                                                    echo "selected";
+                                                                } ?>>Delivered</option>
                                     <option value="Cancelled" <?php if (
-                                        $row["status"] == "Cancelled"
-                                    ) {
-                                        echo "selected";
-                                    } ?>>Cancelled</option>
+                                                                    $row["status"] == "Cancelled"
+                                                                ) {
+                                                                    echo "selected";
+                                                                } ?>>Cancelled</option>
                                 </select>
                                 <button type="submit" name="update_status" class="button">Update</button>
                             </form>
@@ -450,9 +464,7 @@ $result_orders = $conn->query($sql_orders);
                                 Details
                             </button>
                             <form method="post" style="display: inline;">
-                                <input type="hidden" name="order_id" value="<?php echo $row[
-                                    "order_id"
-                                ]; ?>">
+                                <input type="hidden" name="order_id" value="<?php echo $row["order_id"]; ?>">
                                 <button type="submit" name="delete_order" class="button" onclick="return confirm('Are you sure?')">Delete</button>
                             </form>
                         </td>
@@ -466,9 +478,7 @@ $result_orders = $conn->query($sql_orders);
     '<?php echo htmlspecialchars($row["total_price"]); ?>'
 )" class="button">Generate Voucher</button>
                             <?php else: ?>
-                                <span><?php echo $row[
-                                    "voucher_number"
-                                ]; ?></span>
+                                <span><?php echo $row["voucher_number"]; ?></span>
                             <?php endif; ?>
                         </td>
                     </tr>
@@ -550,6 +560,20 @@ $result_orders = $conn->query($sql_orders);
         </div>
     </div>
 
+    <!-- Modal Structure -->
+    <!-- Modal Structure -->
+    
+    <div id="imageModal" class="modal">
+    
+        <!-- Close button -->
+        <span class="close" onclick="closeimage()">&times;</span>
+        <!-- Modal Image -->
+        <img class="modal-content" id="modalImage">
+    </div>
+ 
+
+
+
 
     <script>
         function openVoucherForm(orderId, shippingName, shippingPhone, shippingAddress, total) {
@@ -587,6 +611,20 @@ $result_orders = $conn->query($sql_orders);
 
         function closeDetailsModal() {
             document.getElementById("detailsModal").style.display = "none";
+        }
+
+        // Function to open the modal
+        function showimage(imageSrc) {
+            var modal = document.getElementById("imageModal");
+            var modalImage = document.getElementById("modalImage");
+            modal.style.display = "block";
+            modalImage.src = imageSrc;
+        }
+
+        // Function to close the modal
+        function closeimage() {
+            var modal = document.getElementById("imageModal");
+            modal.style.display = "none";
         }
     </script>
 

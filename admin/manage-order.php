@@ -6,6 +6,7 @@ if (isset($_POST['submitted']) && $_POST['submitted'] == 1) {
     $shipping_charges = filter_input(INPUT_POST, 'shipping_charges', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
     $delivery_time = filter_input(INPUT_POST, 'delivery_time', FILTER_SANITIZE_STRING);
 
+
     if ($order_id && $shipping_charges && $delivery_time) {
         // Check if voucher already exists
         $stmt = $conn->prepare("SELECT voucher_number FROM checkout WHERE order_id = ?");
@@ -16,26 +17,26 @@ if (isset($_POST['submitted']) && $_POST['submitted'] == 1) {
         if ($result && $result->num_rows > 0) {
             $row = $result->fetch_assoc();
             $existing_voucher = $row['voucher_number'];
-        
+
             // Check if voucher is NULL or empty
             if (empty($existing_voucher) || $existing_voucher === 'N/A') {
                 // Generate a new voucher
                 $voucher_number = 'OK-' . strtoupper(substr(md5(uniqid('', true)), 0, 6));
-        
+
                 // Prepare the UPDATE query to save the new voucher
-                $stmt = $conn->prepare("UPDATE checkout SET voucher_number = ?, shipping_charges = ? WHERE order_id = ?");
-                $stmt->bind_param("sdi", $voucher_number, $shipping_charges, $order_id);
-        
+                $stmt = $conn->prepare("UPDATE checkout SET voucher_number = ?, shipping_charges = ?, delivery_time = ? WHERE order_id = ?");
+                $stmt->bind_param("sdii", $voucher_number, $shipping_charges, $delivery_time, $order_id);
+
                 if ($stmt->execute()) {
                     // Redirect after successful operation
-                    header("Location: manage-orders.php");
+                    header("Location: manage-order.php");
                     exit();
                 } else {
                     echo "<p>Error executing update: " . $stmt->error . "</p>";
                 }
             } else {
                 // Voucher already exists, handle as needed
-                header("Location: manage-orders.php");
+                header("Location: manage-order.php");
                 exit();
             }
         } else {
@@ -248,6 +249,16 @@ $result_orders = $conn->query($sql_orders);
             border-color: #007bff;
             outline: none;
         }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+        }
+
+        .form-group {
+            flex: 1;
+        }
     </style>
 </head>
 
@@ -317,7 +328,13 @@ $result_orders = $conn->query($sql_orders);
                         </td>
                         <td>
                             <?php if ($row['voucher_number'] === 'N/A'): ?>
-                                <button onclick="openVoucherForm(<?php echo $row['order_id']; ?>, '<?php echo htmlspecialchars($row['shipping_name']); ?>', '<?php echo htmlspecialchars($row['shipping_phone']); ?>', '<?php echo htmlspecialchars($row['shipping_address']); ?>')" class="button">Generate Voucher</button>
+                                <button onclick="openVoucherForm(
+    <?php echo $row['order_id']; ?>, 
+    '<?php echo htmlspecialchars($row['shipping_name']); ?>', 
+    '<?php echo htmlspecialchars($row['shipping_phone']); ?>', 
+    '<?php echo htmlspecialchars($row['shipping_address']); ?>', 
+    '<?php echo htmlspecialchars($row['total_price']); ?>'
+)" class="button">Generate Voucher</button>
                             <?php else: ?>
                                 <span><?php echo $row['voucher_number']; ?></span>
                             <?php endif; ?>
@@ -340,46 +357,60 @@ $result_orders = $conn->query($sql_orders);
             <h2 class="voucher-title">Generate Voucher</h2>
             <form method="post" class="voucher-form">
                 <input type="hidden" name="order_id" id="order_id">
-                <div class="form-group">
-                    <label for="customer_name">Customer Name:</label>
-                    <input type="text" id="customer_name" class="form-input" readonly value="<?php echo htmlspecialchars($shipping_name); ?>">
+
+                <!-- First Row (Two Columns) -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="customer_name">Customer Name:</label>
+                        <p id="customer_name"></p>
+                    </div>
+                    <div class="form-group">
+                        <label for="customer_phone">Phone:</label>
+                        <p id="customer_phone"></p>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="customer_phone">Phone:</label>
-                    <input type="text" id="customer_phone" class="form-input" readonly value="<?php echo htmlspecialchars($shipping_phone); ?>">
+                <!-- Second Row (Two Columns) -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="customer_address">Address:</label>
+                        <p id="customer_address"></p>
+                    </div>
+                    <div class="form-group">
+                        <label for="total_charges">Total Bill (excluding shipping):</label>
+                        <p id="total_charges"></p>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="customer_address">Address:</label>
-                    <input type="text" id="customer_address" class="form-input" readonly value="<?php echo htmlspecialchars($shipping_address); ?>">
-                </div>
-
+                <!-- Remaining Single-Column Fields -->
                 <div class="form-group">
                     <label for="shipping_charges">Shipping Charges:</label>
                     <input type="number" name="shipping_charges" class="form-input" required>
                 </div>
-
                 <div class="form-group">
-                    <label for="delivery_time">Delivery Time (days):</label>
+                    <label for="delivery_time">Delivery Time :</label>
                     <input type="number" name="delivery_time" class="form-input" required>
                 </div>
+
                 <input type="hidden" name="submitted" value="1">
-                <button type="submit" name="submit_voucher" class="button">Generate Voucher</button>
+                <button type="submit" class="button">Submit</button>
             </form>
         </div>
     </div>
 
 
     <script>
-        function openVoucherForm(orderId, shippingName, shippingPhone, shippingAddress) {
-    // Open modal and prefill data
-    document.getElementById('voucherForm').style.display = 'block';
-    document.getElementById('order_id').value = orderId;
-    document.getElementById('customer_name').value = shippingName; // Corrected this line
-    document.getElementById('customer_phone').value = shippingPhone;
-    document.getElementById('customer_address').value = shippingAddress;
-}
+        function openVoucherForm(orderId, shippingName, shippingPhone, shippingAddress, total) {
+            // Open modal and prefill data
+            console.log(total);
+
+            document.getElementById('voucherForm').style.display = 'block';
+            document.getElementById('order_id').value = orderId;
+            document.getElementById('customer_name').innerText = shippingName; // Corrected this line
+            document.getElementById('customer_phone').innerText = shippingPhone;
+            document.getElementById('customer_address').innerText = shippingAddress;
+            document.getElementById('total_charges').innerText = total;
+        }
 
         function closeVoucherForm() {
             document.getElementById('voucherForm').style.display = 'none';

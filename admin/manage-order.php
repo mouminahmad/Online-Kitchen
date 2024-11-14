@@ -47,9 +47,33 @@ if (isset($_POST['submitted']) && $_POST['submitted'] == 1) {
 
 
 
+if (isset($_POST['update_voucher_status'])) {
+    $order_id = filter_input(INPUT_POST, 'order_id', FILTER_SANITIZE_NUMBER_INT);
+    $voucher_status = filter_input(INPUT_POST, 'voucher_status', FILTER_SANITIZE_STRING);
+
+    $stmt = $conn->prepare("UPDATE checkout SET voucher_status = ? WHERE order_id = ?");
+    $stmt->bind_param("si", $voucher_status, $order_id);
+    if ($stmt->execute()) {
+        echo "<p>Voucher status updated successfully.</p>";
+    } else {
+        echo "<p>Error updating voucher status: " . $stmt->error . "</p>";
+    }
+}
 
 
+// Update Order Status
+if (isset($_POST['update_status'])) {
+    $order_id = filter_input(INPUT_POST, 'order_id', FILTER_SANITIZE_NUMBER_INT);
+    $status = filter_input(INPUT_POST, 'status', FILTER_SANITIZE_STRING);
 
+    $stmt = $conn->prepare("UPDATE checkout SET status = ? WHERE order_id = ?");
+    $stmt->bind_param("si", $status, $order_id);
+    if ($stmt->execute()) {
+        echo "<p>Order status updated successfully.</p>";
+    } else {
+        echo "<p>Error updating order status: " . $stmt->error . "</p>";
+    }
+}
 
 
 
@@ -320,8 +344,8 @@ $result_orders = $conn->query($sql_orders);
                             </form>
                         </td>
                         <td>
-<button 
-    onclick="showDetails(
+                            <button
+                                onclick="showDetails(
         <?php echo $row['order_id']; ?>,
         <?php echo $row['user_id']; ?>,
         '<?php echo number_format($row['total_price'], 2); ?>',
@@ -331,10 +355,10 @@ $result_orders = $conn->query($sql_orders);
         '<?php echo htmlspecialchars($row['voucher_number']); ?>',
         '<?php echo $row['order_date']; ?>',
         '<?php echo $row['status']; ?>'
-    )" 
-    class="button">
-    Details
-</button>
+    )"
+                                class="button">
+                                Details
+                            </button>
                             <form method="post" style="display: inline;">
                                 <input type="hidden" name="order_id" value="<?php echo $row['order_id']; ?>">
                                 <button type="submit" name="delete_order" class="button" onclick="return confirm('Are you sure?')">Delete</button>

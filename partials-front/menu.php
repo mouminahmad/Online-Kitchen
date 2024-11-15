@@ -19,7 +19,7 @@
         <div class="container">
             <div class="logo">
                 <a href="http://localhost/food-order/" title="Logo">
-                    <img src="images/logo.png" alt="Restaurant Logo" class="img-responsive">
+                    <img src="/images/logo.png" alt="Restaurant Logo" class="img-responsive">
                 </a>
             </div>
             <br>
@@ -49,7 +49,8 @@
                         } else {
                            
                             echo  '<li class="nav-item"><a href="order_details.php" class="nav-link active">Myorders</a> </li>';
-                            echo  '<li class="nav-item"><a href="user_request.php" class="nav-link active">custome Food Request</a> </li>';
+                            echo  '<li class="nav-item"><a href="user_request.php" class="nav-link active">Food Request</a> </li>';
+                            echo  '<li class="nav-item"><a href="update_profile.php" class="nav-link active">Update Profile</a> </li>';
                             echo  '<li class="nav-item"><a href="logout.php" class="nav-link active">Logout</a> </li>';
                         }
                         ?>

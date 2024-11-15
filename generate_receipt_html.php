@@ -1,88 +1,65 @@
 <?php
-session_start();
+// Include database configuration
+include('config/constants.php'); // Database connection file
 
-if (!isset($_SESSION['voucher_number']) || !isset($_SESSION['cart'])) {
-    header("Location: checkout.php");
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
+    header("Location: login.php");
     exit();
 }
 
-$voucherNumber = $_SESSION['voucher_number'];
-$cartItems = $_SESSION['cart'];
-$totalPrice = 0;
+if (isset($_GET['order_id'])) {
+    $orderId = $_GET['order_id'];
+    $userId = $_SESSION['u_id'];
 
-// Calculate the total price of the cart items
-foreach ($cartItems as $item) {
-    $totalPrice += $item['price'] * $item['Quantity'];
+    // Fetch order details
+    $stmt = $conn->prepare("SELECT * FROM checkout WHERE order_id = ? AND user_id = ?");
+    $stmt->bind_param("ii", $orderId, $userId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $order = $result->fetch_assoc();
+
+    if ($order) {
+        // Calculate total amount and total time
+        $totalAmount = $order['total_price'] + $order['shipping_charges'];
+        $totalTime = $order['delivery_time'] + $order['total_cooking_time'];
+
+        // Prepare the receipt content
+        $receiptContent = "
+        Order Receipt\n
+        =========================\n
+        Order ID: " . $order['order_id'] . "\n
+        Order Date: " . date("d-m-Y", strtotime($order['order_date'])) . "\n
+        Total Price: RS " . number_format($order['total_price'], 2) . "\n
+        Order Status: " . ucfirst($order['status']) . "\n\n
+        
+        Shipping Details:\n
+        Name: " . $order['shipping_name'] . "\n
+        Address: " . $order['shipping_address'] . "\n
+        Phone: " . $order['shipping_phone'] . "\n
+        Shipping Cost: RS " . number_format($order['shipping_charges'], 2) . "\n
+        Total Amount (Shipping + Price): RS " . number_format($totalAmount, 2) . "\n
+        Delivery Time: " . $order['delivery_time'] . " mins\n
+        Cooking Time: " . $order['total_cooking_time'] . " mins\n
+        Total Time (Delivery + Cooking): " . $totalTime . " mins\n
+        =========================\n";
+
+        // Set the download headers for a text file
+        header('Content-Type: text/plain');
+        header('Content-Disposition: attachment; filename="order_receipt_' . $orderId . '.txt"');
+        header('Content-Length: ' . strlen($receiptContent));
+
+        // Output the content of the receipt
+        echo $receiptContent;
+    } else {
+        echo "Order not found or you do not have permission to access it.";
+    }
+
+    $stmt->close();
+    $conn->close();
+    exit();
 }
-
-// Define the shipping charge (can be dynamic based on conditions)
-$shippingCharge = 250; // Example fixed shipping charge
-
-// Calculate the grand total (including shipping charges)
-$grandTotal = $totalPrice + $shippingCharge;
-
-// Send headers to download as .html file
-header('Content-Type: text/html');
-header("Content-Disposition: attachment; filename=Order_Receipt_$voucherNumber.html");
-
-// Start HTML content
-echo "
-<!DOCTYPE html>
-<html>
-<head>
-    <style>
-        body { font-family: Arial, sans-serif; color: #333; }
-        h1 { color: #4CAF50; text-align: center; }
-        .receipt-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .receipt-table th, .receipt-table td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-        .receipt-table th { background-color: #f2f2f2; }
-        .total { font-weight: bold; }
-    </style>
-</head>
-<body>
-
-<h1>Order Receipt</h1>
-<p>Thank you for your order! Your voucher number is: <strong>$voucherNumber</strong></p>
-
-<table class='receipt-table'>
-    <tr>
-        <th>S.N</th>
-        <th>Product Name</th>
-        <th>Price</th>
-        <th>Quantity</th>
-        <th>Total</th>
-    </tr>";
-
-$serialNumber = 1;
-foreach ($cartItems as $item) {
-    $itemTotal = $item['price'] * $item['Quantity'];
-    echo "
-    <tr>
-        <td>$serialNumber</td>
-        <td>{$item['title']}</td>
-        <td>Rs. " . number_format($item['price'], 2) . "</td>
-        <td>{$item['Quantity']}</td>
-        <td>Rs. " . number_format($itemTotal, 2) . "</td>
-    </tr>";
-    $serialNumber++;
-}
-
-// Display the total price, shipping charges, and grand total
-echo "
-    <tr>
-        <td colspan='4' class='total'>Total Price</td>
-        <td class='total'>Rs. " . number_format($totalPrice, 2) . "</td>
-    </tr>
-    <tr>
-        <td colspan='4' class='total'>Shipping Charges</td>
-        <td class='total'>Rs. " . number_format($shippingCharge, 2) . "</td>
-    </tr>
-    <tr>
-        <td colspan='4' class='total'>Grand Total</td>
-        <td class='total'>Rs. " . number_format($grandTotal, 2) . "</td>
-    </tr>
-</table>
-
-</body>
-</html>";
 ?>

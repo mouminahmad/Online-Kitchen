@@ -48,8 +48,8 @@
                             echo '<li class="nav-item"><a href="login.php" class="nav-link active">Login</a> </li>';
                         } else {
                            
-                            echo  '<li class="nav-item"><a href="myorders.php" class="nav-link active">Myorders</a> </li>';
                             echo  '<li class="nav-item"><a href="order_details.php" class="nav-link active">Myorders</a> </li>';
+                            echo  '<li class="nav-item"><a href="user_request.php" class="nav-link active">custome Food Request</a> </li>';
                             echo  '<li class="nav-item"><a href="logout.php" class="nav-link active">Logout</a> </li>';
                         }
                         ?>

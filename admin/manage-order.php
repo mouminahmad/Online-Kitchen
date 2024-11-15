@@ -147,8 +147,7 @@ $sql_orders = "
         c.shipping_name,       -- Added shipping name
         c.shipping_address,    -- Added shipping address
         c.shipping_phone,      -- Added shipping phone
-        vu.voucher_image, 
-        vu.voucher_status AS voucher_upload_status
+        vu.voucher_image
     FROM checkout c
     LEFT JOIN voucher_uploads vu ON c.order_id = vu.order_id
     ORDER BY c.order_date DESC

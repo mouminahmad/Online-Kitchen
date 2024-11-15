@@ -219,25 +219,25 @@ $result = $stmt->get_result();
 
             <!-- Add the link to generate receipt -->
             <a id="generateReceiptBtn" href="" class="download-btn" target="_blank">Download Receipt</a>
+            <form action="upload_voucher.php" method="POST" enctype="multipart/form-data" style="margin-top: 20px;">
+                <label for="voucher_image">Upload Voucher Image:</label>
+                <input type="file" name="voucher_image" id="voucher_image" required>
+                <input type="hidden" name="order_id" id="order_id_input">
+                <button type="submit" style="padding: 10px 20px; background-color: #4CAF50; color: #fff; border: none; cursor: pointer;">Upload Voucher</button>
+            </form>
 
-
-            <div class="upload-section">
-                <form action="" method="POST" enctype="multipart/form-data">
-                    <input type="file" name="voucher_file" accept=".jpg,.jpeg,.png,.pdf" required>
-                    <button type="submit" class="upload-btn">Upload Voucher</button>
-                </form>
-
-
-            </div>
 
 
         </div>
+
+
+    </div>
     </div>
 
     <script>
         function showOrderDetails(order) {
             document.getElementById("modalOrderId").innerText = order.order_id;
-            document.getElementById("modalOrderDate").innerText = order.order_date;
+            document.getElementById("order_id_input").value = order.order_id;             document.getElementById("modalOrderDate").innerText = order.order_date;
             document.getElementById("modalTotalPrice").innerText = parseFloat(order.total_price).toFixed(2);
             document.getElementById("modalStatus").innerText = order.status;
             document.getElementById("modalVoucherStatus").innerText = order.voucher_status;

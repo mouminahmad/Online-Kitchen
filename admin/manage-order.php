@@ -153,6 +153,8 @@ $sql_orders = "
     ORDER BY c.order_date DESC
 ";
 $result_orders = $conn->query($sql_orders);
+
+
 ?>
 
 <!DOCTYPE html>
@@ -331,7 +333,7 @@ $result_orders = $conn->query($sql_orders);
         .form-group {
             flex: 1;
         }
-        
+
 
         /* Close button styles */
         .close {
@@ -355,7 +357,7 @@ $result_orders = $conn->query($sql_orders);
 
 <body>
 
-<br>
+    <br>
     <h1>Admin Order Management</h1>
     <br>
     <br>
@@ -449,22 +451,12 @@ $result_orders = $conn->query($sql_orders);
                                 <button type="submit" name="update_status" class="button">Update</button>
                             </form>
                         </td>
-                        <td>
-                            <button
-                                onclick="showDetails(
-        <?php echo $row["order_id"]; ?>,
-        <?php echo $row["user_id"]; ?>,
-        '<?php echo number_format($row["total_price"], 2); ?>',
-        '<?php echo htmlspecialchars($row["shipping_name"]); ?>',
-        '<?php echo htmlspecialchars($row["shipping_address"]); ?>',
-        '<?php echo htmlspecialchars($row["shipping_phone"]); ?>',
-        '<?php echo htmlspecialchars($row["voucher_number"]); ?>',
-        '<?php echo $row["order_date"]; ?>',
-        '<?php echo $row["status"]; ?>'
-    )"
-                                class="button">
-                                Details
-                            </button>
+                        <td style="display: flex; gap : 2px; justify-content : center; align-items: center; margin-top:12px;">
+                            <form  action="order-detail.php" method="post" >
+                                <input type="hidden" name="order_id" value="<?php echo $row["order_id"]; ?>">
+                                <button class="button"> Details </button>
+                            </form>
+                           
                             <form method="post" style="display: inline;">
                                 <input type="hidden" name="order_id" value="<?php echo $row["order_id"]; ?>">
                                 <button type="submit" name="delete_order" class="button" onclick="return confirm('Are you sure?')">Delete</button>
@@ -526,7 +518,7 @@ $result_orders = $conn->query($sql_orders);
                     </div>
                 </div>
 
-                <!-- Remaining Single-Column Fields -->
+
                 <div class="form-group">
                     <label for="shipping_charges">Shipping Charges:</label>
                     <input type="number" name="shipping_charges" class="form-input" required>
@@ -542,37 +534,19 @@ $result_orders = $conn->query($sql_orders);
         </div>
     </div>
 
-    <!-- Details Modal -->
-    <div id="detailsModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeDetailsModal()">&times;</span>
-            <h2>Order Details</h2>
-            <div id="orderDetailsContent">
-                <!-- Order details will be populated here -->
-                <p><strong>Order ID:</strong> <span id="modalOrderID"></span></p>
-                <p><strong>User ID:</strong> <span id="modalUserID"></span></p>
-                <p><strong>Total Price:</strong> <span id="modalTotalPrice"></span></p>
-                <p><strong>Shipping Name:</strong> <span id="modalShippingName"></span></p>
-                <p><strong>Shipping Address:</strong> <span id="modalShippingAddress"></span></p>
-                <p><strong>Shipping Phone:</strong> <span id="modalShippingPhone"></span></p>
-                <p><strong>Voucher Number:</strong> <span id="modalVoucherNumber"></span></p>
-                <p><strong>Order Date:</strong> <span id="modalOrderDate"></span></p>
-                <p><strong>Status:</strong> <span id="modalStatus"></span></p>
-            </div>
-        </div>
-    </div>
+    
 
     <!-- Modal Structure -->
     <!-- Modal Structure -->
-    
+
     <div id="imageModal" class="modal">
-    
+
         <!-- Close button -->
         <span class="close" onclick="closeimage()">&times;</span>
         <!-- Modal Image -->
         <img class="modal-content" id="modalImage">
     </div>
- 
+
 
 
 
@@ -592,27 +566,6 @@ $result_orders = $conn->query($sql_orders);
 
         function closeVoucherForm() {
             document.getElementById('voucherForm').style.display = 'none';
-        }
-
-
-        function showDetails(orderID, userID, totalPrice, shippingName, shippingAddress, shippingPhone, voucherNumber, orderDate, status) {
-            // Populate modal fields with order details
-            document.getElementById("modalOrderID").innerText = orderID;
-            document.getElementById("modalUserID").innerText = userID;
-            document.getElementById("modalTotalPrice").innerText = totalPrice;
-            document.getElementById("modalShippingName").innerText = shippingName;
-            document.getElementById("modalShippingAddress").innerText = shippingAddress;
-            document.getElementById("modalShippingPhone").innerText = shippingPhone;
-            document.getElementById("modalVoucherNumber").innerText = voucherNumber;
-            document.getElementById("modalOrderDate").innerText = orderDate;
-            document.getElementById("modalStatus").innerText = status;
-
-            // Show the modal
-            document.getElementById("detailsModal").style.display = "block";
-        }
-
-        function closeDetailsModal() {
-            document.getElementById("detailsModal").style.display = "none";
         }
 
         // Function to open the modal

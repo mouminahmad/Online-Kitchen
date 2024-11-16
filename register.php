@@ -42,6 +42,7 @@
                 $result = mysqli_query($conn, $sql);
         
                 if ($result) {
+                    header("Location: login.php");
                     $showAlert = true; 
                 }
             } 
@@ -85,7 +86,7 @@
         <div class="container">
             <div class="logo">
                 <a href="http://localhost/food-order/" title="Logo">
-                    <img src="images/logo.png" alt="Restaurant Logo" class="img-responsive">
+                    <img src="images/ok-logo.png" alt="Restaurant Logo" class="img-responsive">
                 </a>
             </div>
 <br>

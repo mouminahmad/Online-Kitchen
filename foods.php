@@ -4,7 +4,9 @@
     
 
     <!-- fOOD sEARCH Section Starts Here -->
-    <section class="food-search text-center">
+    <section class="food-search text-center" style="background-image: 
+        linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), /* Gradient overlay */
+        url(./images/hero.png);">
         <div class="container">
             
             <form action="<?php echo SITEURL; ?>food-search.php" method="POST">
@@ -86,7 +88,7 @@
                                 <input type="hidden" value="<?php echo $cooking_time ?>" name="cooking_time">
                                 <button type="submit" name="Add_To_Cart"  class="btn btn-primary">Add To Cart</button>
                                 
-                                <a href="<?php echo SITEURL; ?>order.php?food_id=<?php echo $id; ?>" class="btn btn-primary">Order Now</a>
+                                
                             </div>
                             </form>
                         </div>

@@ -1,5 +1,6 @@
 <?php
 // Initialize the session
+include('config/constants.php'); 
 
 
 // Check if the user is already logged in; if yes, redirect them to the welcome page or intended page
@@ -9,7 +10,7 @@ if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
     exit;
 }
 
-include('config/constants.php'); 
+
 
 // Define variables and initialize with empty values
 $username = $password = "";
@@ -112,7 +113,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         <div class="container">
             <div class="logo">
                 <a href="http://localhost/food-order/" title="Logo">
-                    <img src="images/logo.png" alt="Restaurant Logo" class="img-responsive">
+                    <img src="images/ok-logo.png" alt="Restaurant Logo" class="img-responsive">
                 </a>
             </div>
             <br>

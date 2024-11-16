@@ -1,7 +1,9 @@
     <?php include('partials-front/menu.php'); ?>
 
     <!-- fOOD sEARCH Section Starts Here -->
-    <section class="food-search text-center">
+    <section class=" hero food-search text-center" style="background-image: 
+        linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), /* Gradient overlay */
+        url(./images/hero.png); ">
         <div class="container">
 
             <form action="<?php echo SITEURL; ?>food-search.php" method="POST">
@@ -18,7 +20,7 @@
         echo $_SESSION['order'];
         unset($_SESSION['order']);
     }
-    ?>
+    ?> 
 
     <!-- CAtegories Section Starts Here -->
     <section class="categories">
@@ -143,8 +145,6 @@
                                 <input type="hidden" value="<?php echo $image_name ?>" name="image_name">
                                 <input type="hidden" value="<?php echo $cooking_time ?>" name="cooking_time">
                                 <button type="submit" name="Add_To_Cart"  class="btn btn-primary">Add To Cart</button>
-                                
-                            <a href="<?php echo SITEURL; ?>order.php?food_id=<?php echo $id; ?>" class="btn btn-primary">Order Now</a>
                         </form>
                         </div>
 

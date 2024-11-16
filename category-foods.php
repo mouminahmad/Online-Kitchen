@@ -28,7 +28,9 @@
 
 
     <!-- fOOD sEARCH Section Starts Here -->
-    <section class="food-search text-center">
+    <section class="food-search text-center" style="background-image: 
+        linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), /* Gradient overlay */
+        url(./images/hero.png);">
         <div class="container">
             
             <h2>Foods on <a href="#" class="text-white">"<?php echo $category_title; ?>"</a></h2>

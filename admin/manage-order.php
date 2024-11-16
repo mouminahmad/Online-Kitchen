@@ -355,7 +355,10 @@ $result_orders = $conn->query($sql_orders);
 
 <body>
 
+<br>
     <h1>Admin Order Management</h1>
+    <br>
+    <br>
 
     <table>
         <thead>

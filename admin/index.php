@@ -51,7 +51,7 @@
                     
                     <?php 
                         //Sql Query 
-                        $sql3 = "SELECT * FROM tbl_order";
+                        $sql3 = "SELECT * FROM checkout";
                         //Execute Query
                         $res3 = mysqli_query($conn, $sql3);
                         //Count Rows

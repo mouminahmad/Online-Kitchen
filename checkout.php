@@ -24,7 +24,6 @@ include('partials-front/menu.php');
 // Calculate total price
 $total = 0;
 foreach ($_SESSION['cart'] as $item) {
-    print_r($item);
     $total += $item['price'] * $item['Quantity'];
 }
 ?>

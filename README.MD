@@ -44,10 +44,6 @@ username: admin
 
 password: admin
 
-# TO-DO List
-
-## OPTIONAL
-1. Add a cart to order items 
 
 # Recommanded tools to run
 1. [XAMPP](https://www.apachefriends.org/download.html)

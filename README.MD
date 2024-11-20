@@ -4,12 +4,20 @@
 ![Screenshot](/screenshots/1.png?raw=true "Screenshot")
 ![Screenshot](/screenshots/2.png?raw=true "Screenshot")
 ![Screenshot](/screenshots/3.png?raw=true "Screenshot")
-
-
-## Admin Panel
 ![Screenshot](/screenshots/4.png?raw=true "Screenshot")
 ![Screenshot](/screenshots/5.png?raw=true "Screenshot")
 ![Screenshot](/screenshots/6.png?raw=true "Screenshot")
+
+
+## Admin Panel
+![Screenshot](/screenshots/7.png?raw=true "Screenshot")
+![Screenshot](/screenshots/8.png?raw=true "Screenshot")
+![Screenshot](/screenshots/9.png?raw=true "Screenshot")
+![Screenshot](/screenshots/10.png?raw=true "Screenshot")
+![Screenshot](/screenshots/11.png?raw=true "Screenshot")
+![Screenshot](/screenshots/12.png?raw=true "Screenshot")
+![Screenshot](/screenshots/13.png?raw=true "Screenshot")
+![Screenshot](/screenshots/14.png?raw=true "Screenshot")
 
 
 # How to run?

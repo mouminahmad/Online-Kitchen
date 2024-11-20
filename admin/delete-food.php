@@ -38,7 +38,7 @@
         }
 
         //3. Delete Food from Database
-        $sql = "DELETE FROM tbl_food WHERE id=$id";
+        $sql = "DELETE FROM food WHERE id=$id";
         //Execute the Query
         $res = mysqli_query($conn, $sql);
 

@@ -57,7 +57,7 @@
                         <select name="category" required>
                             <?php 
                                 // Create SQL to get all active categories from database
-                                $sql = "SELECT * FROM tbl_category WHERE active='Yes'";
+                                $sql = "SELECT * FROM category WHERE active='Yes'";
                                 $res = mysqli_query($conn, $sql);
                                 $count = mysqli_num_rows($res);
 
@@ -139,7 +139,7 @@
                 }
 
                 // Insert Into Database
-                $sql2 = "INSERT INTO tbl_food SET 
+                $sql2 = "INSERT INTO food SET 
                     title = '$title',
                     description = '$description',
                     price = $price,

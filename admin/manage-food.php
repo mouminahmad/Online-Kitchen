@@ -49,7 +49,7 @@
             </tr>
 
             <?php 
-                $sql = "SELECT * FROM tbl_food";
+                $sql = "SELECT * FROM food";
                 $res = mysqli_query($conn, $sql);
                 $count = mysqli_num_rows($res);
                 $sn = 1;

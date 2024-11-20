@@ -33,7 +33,7 @@
 
         //Delete Data from Database
         //SQL Query to Delete Data from Database
-        $sql = "DELETE FROM tbl_category WHERE id=$id";
+        $sql = "DELETE FROM category WHERE id=$id";
 
         //Execute the Query
         $res = mysqli_query($conn, $sql);

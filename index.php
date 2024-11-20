@@ -29,7 +29,7 @@
 
             <?php
             //Create SQL Query to Display CAtegories from Database
-            $sql = "SELECT * FROM tbl_category WHERE active='Yes' AND featured='Yes' LIMIT 3";
+            $sql = "SELECT * FROM category WHERE active='Yes' AND featured='Yes' LIMIT 3";
             //Execute the Query
             $res = mysqli_query($conn, $sql);
             //Count rows to check whether the category is available or not
@@ -89,7 +89,7 @@
 
             //Getting Foods from Database that are active and featured
             //SQL Query
-            $sql2 = "SELECT * FROM tbl_food WHERE active='Yes' AND featured='Yes' LIMIT 6";
+            $sql2 = "SELECT * FROM food WHERE active='Yes' AND featured='Yes' LIMIT 6";
 
             //Execute the Query
             $res2 = mysqli_query($conn, $sql2);
@@ -170,7 +170,7 @@
         </div>
 
         <p class="text-center">
-            <a href="http://localhost/food-order/foods.php">See All Foods</a>
+            <a href="http://localhost/online-kitchen/foods.php">See All Foods</a>
         </p>
     </section>
     <!-- fOOD Menu Section Ends Here -->

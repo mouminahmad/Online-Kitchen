@@ -7,7 +7,7 @@ if (isset($_GET['id'])) {
     $id = $_GET['id'];
 
     // SQL Query to Get the Selected Food
-    $sql2 = "SELECT * FROM tbl_food WHERE id=$id";
+    $sql2 = "SELECT * FROM food WHERE id=$id";
     $res2 = mysqli_query($conn, $sql2);
 
     if ($res2 && mysqli_num_rows($res2) > 0) {
@@ -73,7 +73,7 @@ if (isset($_GET['id'])) {
                     <td>
                         <select name="category">
                             <?php
-                            $sql = "SELECT * FROM tbl_category WHERE active='Yes'";
+                            $sql = "SELECT * FROM category WHERE active='Yes'";
                             $res = mysqli_query($conn, $sql);
                             if ($res && mysqli_num_rows($res) > 0) {
                                 while ($row = mysqli_fetch_assoc($res)) {
@@ -152,7 +152,7 @@ if (isset($_GET['id'])) {
                 $image_name = $current_image;
             }
 
-            $sql3 = "UPDATE tbl_food SET 
+            $sql3 = "UPDATE food SET 
                 title = '$title',
                 description = '$description',
                 price = $price,

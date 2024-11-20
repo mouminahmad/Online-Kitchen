@@ -24,13 +24,13 @@ Open your favorite browser; we recommend using Google Chrome or Mozilla Firefox.
 
 Then, go to the URL “http://localhost/phpmyadmin“
 
-Create a Database with the name food-order
+Create a Database with the name online-kitchen
 
-Click on the “Import” tab and choose the database file (food-order.sql) which is provided under the folder naming “DATABASE FILE”.
+Click on the “Import” tab and choose the database file (online-kitchen.sql) which is provided under the folder naming “DATABASE FILE”.
 
-After setting up all these, go to the URL “http://localhost/food-order/"
+After setting up all these, go to the URL “http://localhost/online-kitchen/"
 
-To login to admin portal , go to the URL "http://localhost/food-order/admin/login.php" with the following user name and password
+To login to admin portal , go to the URL "http://localhost/online-kitchen/admin/login.php" with the following user name and password
 
 username: admin
 

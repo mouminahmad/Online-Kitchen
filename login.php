@@ -112,7 +112,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     <section class="navbar">
         <div class="container">
             <div class="logo">
-                <a href="http://localhost/food-order/" title="Logo">
+                <a href="http://localhost/online-kitchen/" title="Logo">
                     <img src="images/ok-logo.png" alt="Restaurant Logo" class="img-responsive">
                 </a>
             </div>

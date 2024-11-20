@@ -305,7 +305,7 @@ fieldset{
     color: #2596be;
 }
 /* Food order page css */
-.food-order{
+.online-kitchen{
     background-image: url(../images/bg3.jpg);
     background-size: cover;
     background-repeat: no-repeat;
@@ -313,7 +313,7 @@ fieldset{
     padding: 7% 0;
 }
 
-.food-order input[type="search"]{
+.online-kitchen input[type="search"]{
     width: 50%;
     padding: 1%;
     font-size: 1rem;

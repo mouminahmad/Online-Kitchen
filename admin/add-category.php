@@ -151,7 +151,7 @@
                 }
 
                 //2. Create SQL Query to Insert CAtegory into Database
-                $sql = "INSERT INTO tbl_category SET 
+                $sql = "INSERT INTO category SET 
                     title='$title',
                     image_name='$image_name',
                     featured='$featured',

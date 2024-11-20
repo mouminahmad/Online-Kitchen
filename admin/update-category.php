@@ -16,7 +16,7 @@
                 //echo "Getting the Data";
                 $id = $_GET['id'];
                 //Create SQL Query to get all other details
-                $sql = "SELECT * FROM tbl_category WHERE id=$id";
+                $sql = "SELECT * FROM category WHERE id=$id";
 
                 //Execute the Query
                 $res = mysqli_query($conn, $sql);
@@ -200,7 +200,7 @@
                 }
 
                 //3. Update the Database
-                $sql2 = "UPDATE tbl_category SET 
+                $sql2 = "UPDATE category SET 
                     title = '$title',
                     image_name = '$image_name',
                     featured = '$featured',

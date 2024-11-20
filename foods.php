@@ -27,7 +27,7 @@
 
             <?php 
                 //Display Foods that are Active
-                $sql = "SELECT * FROM tbl_food WHERE active='Yes'";
+                $sql = "SELECT * FROM food WHERE active='Yes'";
 
                 //Execute the Query
                 $res=mysqli_query($conn, $sql);

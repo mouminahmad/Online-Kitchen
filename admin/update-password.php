@@ -65,7 +65,7 @@
 
 
                 //2. Check whether the user with current ID and Current Password Exists or Not
-                $sql = "SELECT * FROM tbl_admin WHERE id=$id AND password='$current_password'";
+                $sql = "SELECT * FROM admin WHERE id=$id AND password='$current_password'";
 
                 //Execute the Query
                 $res = mysqli_query($conn, $sql);
@@ -84,7 +84,7 @@
                         if($new_password==$confirm_password)
                         {
                             //Update the Password
-                            $sql2 = "UPDATE tbl_admin SET 
+                            $sql2 = "UPDATE admin SET 
                                 password='$new_password' 
                                 WHERE id=$id
                             ";

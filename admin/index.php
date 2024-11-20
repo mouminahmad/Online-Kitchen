@@ -19,7 +19,7 @@
 
                     <?php 
                         //Sql Query 
-                        $sql = "SELECT * FROM tbl_category";
+                        $sql = "SELECT * FROM category";
                         //Execute Query
                         $res = mysqli_query($conn, $sql);
                         //Count Rows
@@ -35,7 +35,7 @@
 
                     <?php 
                         //Sql Query 
-                        $sql2 = "SELECT * FROM tbl_food";
+                        $sql2 = "SELECT * FROM food";
                         //Execute Query
                         $res2 = mysqli_query($conn, $sql2);
                         //Count Rows
@@ -83,7 +83,7 @@
                     <?php 
                         //Creat SQL Query to Get Total Revenue Generated
                         //Aggregate Function in SQL
-                        $sql4 = "SELECT SUM(total) AS Total FROM tbl_order WHERE status='Delivered'";
+                        $sql4 = "SELECT SUM(total_price) AS Total FROM checkout WHERE status='Delivered'";
 
                         //Execute the Query
                         $res4 = mysqli_query($conn, $sql4);
@@ -96,7 +96,7 @@
 
                     ?>
 
-                    <h1>₹<?php echo $total_revenue; ?></h1>
+                    <h1>Rs <?php echo $total_revenue; ?></h1>
                     <br />
                     Revenue Generated
                 </div>

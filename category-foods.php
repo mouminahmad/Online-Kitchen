@@ -8,7 +8,7 @@
             //Category id is set and get the id
             $category_id = $_GET['category_id'];
             // Get the CAtegory Title Based on Category ID
-            $sql = "SELECT title FROM tbl_category WHERE id=$category_id";
+            $sql = "SELECT title FROM category WHERE id=$category_id";
 
             //Execute the Query
             $res = mysqli_query($conn, $sql);
@@ -49,7 +49,7 @@
             <?php 
             
                // Create SQL Query to Get foods based on Selected Category
-$sql2 = "SELECT id, title, price, cooking_time, description, image_name FROM tbl_food WHERE category_id=$category_id";
+$sql2 = "SELECT id, title, price, cooking_time, description, image_name FROM food WHERE category_id=$category_id";
 
 // Execute the Query
 $res2 = mysqli_query($conn, $sql2);

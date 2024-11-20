@@ -12,7 +12,7 @@
 
                 //Display all the cateories that are active
                 //Sql Query
-                $sql = "SELECT * FROM tbl_category WHERE active='Yes'";
+                $sql = "SELECT * FROM category WHERE active='Yes'";
 
                 //Execute the Query
                 $res = mysqli_query($conn, $sql);
